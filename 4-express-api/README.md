@@ -10,4 +10,14 @@ Extensiones a instalar en VCode:
 - ESlint
 - REST Client
 - Error Lens
-- Prittier
+- Prettier
+
+{
+    "prettier.semi": false,
+    "prettier.singleQuote": true,
+    "prettier.jsxSingleQuote": true,
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+      },
+}

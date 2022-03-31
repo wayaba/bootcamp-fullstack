@@ -1,106 +1,87 @@
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const logger = require('./loggerMiddelwere')
+const logger = require('./middleware/logger')
+const notFound = require('./middleware/notFound')
+const handlerErrors = require('./middleware/handlerErrors')
+
+require('dotenv').config()
+require('./mongo')
+
+const Note = require('./models/Note')
 
 app.use(cors())
 app.use(express.json())
-
 app.use(logger)
+//localhost:3001/static/bob.png
+app.use('/static', express.static('images'))
 
-// const http = require('http')
-
-//   const app = http.createServer((request, response) => {
-//     response.writeHead(200, { 'Content-Type': 'application/json' })
-//     response.end(JSON.stringify(notes))
-//   })
-
-let notes = [
-  {
-    id: 1,
-    content: 'HTML is easy!!',
-    date: '2019-05-30T17:30:31.098Z',
-    important: true,
-  },
-  {
-    id: 2,
-    content: 'Browser can execute only Javascript',
-    date: '2019-05-30T18:39:34.091Z',
-    important: false,
-  },
-  {
-    id: 3,
-    content: 'GET and POST are the most important methods of HTTP protocol',
-    date: '2019-05-30T19:20:14.298Z',
-    important: true,
-  },
-]
+let notes = []
 
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
 })
 
 app.get('/api/notes', (request, response) => {
-  response.json(notes)
+  Note.find({}).then((notes) => response.json(notes))
 })
 
-app.get('/api/notes/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const note = notes.find((note) => note.id === id)
-  if (note) {
-    response.json(note)
-  } else {
-    response.status(404).end()
-  }
+app.get('/api/notes/:id', (request, response, next) => {
+  const { id } = request.params
+
+  Note.findById(id)
+    .then((note) => {
+      note ? response.json(note) : response.status(404).end()
+    })
+    .catch((e) => next(e))
 })
 
-app.delete('/api/notes/:id', (request, response) => {
-  const id = Number(request.params.id)
-  notes = notes.filter((note) => note.id !== id)
-
-  response.status(204).end()
+app.delete('/api/notes/:id', (request, response, next) => {
+  const { id } = request.params
+  Note.findByIdAndDelete(id)
+    .then(() => response.status(204).end())
+    .catch((error) => next(error))
 })
 
 app.post('/api/notes', (request, response) => {
-  const body = request.body
+  const note = request.body
 
-  if (!body || !body.content) {
+  if (!note || !note.content) {
     return response.status(400).json({
       error: 'content missing',
     })
   }
 
-  const newNote = {
-    id: generateId(),
-    content: body.content,
-    important: typeof body.important !== undefined ? body.important : false,
+  const newNote = new Note({
+    content: note.content,
+    important: note.important || false,
     date: new Date().toISOString(),
-  }
+  })
 
-  notes = [...notes, newNote]
-  console.log(body)
+  newNote
+    .save()
+    .then((savedNote) => response.status(201).json(savedNote))
+    .catch((e) => console.log(e))
 
-  response.status(201).json(newNote)
+  console.log(newNote)
 })
 
 app.put('/api/notes/:id', (request, response) => {
-  const id = Number(request.params.id)
+  const { id } = request.params
+
   const note = request.body
-  notes = notes.map((n) => (n.id === id ? note : n))
+  const noteNewInfo = {
+    content: note.content,
+    important: note.important,
+  }
 
-  response.status(200).json(note)
+  Note.findOneAndUpdate(id, noteNewInfo, { new: true }).then((result) =>
+    response.status(200).json(result)
+  )
 })
 
-const generateId = () => {
-  const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0
-  return maxId + 1
-}
-
-app.use((request, response) => {
-  response.status(404).json({
-    error: 'Not found',
-  })
-})
+app.use(handlerErrors)
+app.use(notFound)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {

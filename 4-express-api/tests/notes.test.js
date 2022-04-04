@@ -38,7 +38,7 @@ describe('GET all', () => {
   })
 })
 
-describe('PUTs', () => {
+describe('POSTs', () => {
   test('a valid note can be added', async () => {
     const newNote = {
       content: 'nota insertada',

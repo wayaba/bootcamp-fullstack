@@ -13,11 +13,33 @@ Extensiones a instalar en VCode:
 - Prettier
 
 {
-    "prettier.semi": false,
-    "prettier.singleQuote": true,
-    "prettier.jsxSingleQuote": true,
-    "[javascript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": true,
-      },
+"prettier.semi": false,
+"prettier.singleQuote": true,
+"prettier.jsxSingleQuote": true,
+"[javascript]": {
+"editor.defaultFormatter": "esbenp.prettier-vscode",
+"editor.formatOnSave": true,
+},
 }
+
+# el .env
+
+Siempre con el puerto
+
+```
+PORT=3001
+```
+
+Para conectar al cloud de mongo
+
+```
+MONGO_DB_URI=mongodb+srv://wayaba:wayaba123@cluster0.0zbxt.mongodb.net/note-db
+MONGO_DB_URI_TEST=mongodb+srv://wayaba:wayaba123@cluster0.0zbxt.mongodb.net/note-test-db
+```
+
+Para conectar al mongo dockerizado
+
+```
+MONGO_DB_URI=mongodb://wayaba:wayaba123@localhost:27017/note-db
+MONGO_DB_URI_TEST=mongodb://wayaba:wayaba123@localhost:27017/note-test-db
+```

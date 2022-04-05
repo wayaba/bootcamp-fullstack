@@ -18,6 +18,7 @@ POST http://localhost:3001/api/notes
 Content-Type: application/json
 
 {
-    "content": "casi mediodia",
-    "important": true
+    "content": "nota mate aa asdb",
+    "important": true,
+    "userId": "624c43d163616da89e3b9987"
 }

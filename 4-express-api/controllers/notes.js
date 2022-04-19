@@ -3,7 +3,9 @@ const Note = require('../models/note')
 const User = require('../models/user')
 
 notesRouter.get('/', (request, response) => {
-  Note.find({}).then((notes) => response.json(notes))
+  Note.find({})
+    .populate('user', { username: 1, name: 1 })
+    .then((notes) => response.json(notes))
 })
 
 notesRouter.get('/:id', (request, response, next) => {
@@ -38,15 +40,17 @@ notesRouter.post('/', async (request, response, next) => {
     content: content,
     important: important,
     date: new Date().toISOString(),
-    user: userId,
+    user: user._id,
   })
 
   try {
+    // await User.findOneAndUpdate({ id: user._id }, user, {
+    //   runValidators: false,
+    // })
+
     const savedNote = await newNote.save()
     user.notes = [...user.notes, savedNote._id]
-    await User.findOneAndUpdate({ id: user._id }, user, {
-      runValidators: false,
-    })
+    await user.save()
 
     response.status(201).json(savedNote)
   } catch (error) {

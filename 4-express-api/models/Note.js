@@ -2,7 +2,11 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const noteSchema = new Schema({
-  content: String,
+  content: {
+    type: String,
+    required: true,
+    minlength: 5,
+  },
   date: Date,
   important: Boolean,
   user: {
@@ -13,7 +17,7 @@ const noteSchema = new Schema({
 
 noteSchema.set('toJSON', {
   transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id
+    returnedObject.id = returnedObject._id.toString()
     delete returnedObject._id
     delete returnedObject.__v
   },

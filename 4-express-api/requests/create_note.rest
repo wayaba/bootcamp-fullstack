@@ -18,7 +18,7 @@ POST http://localhost:3001/api/notes
 Content-Type: application/json
 
 {
-    "content": "nota mate aa asdb",
+    "content": "erelia4",
     "important": true,
-    "userId": "624c43d163616da89e3b9987"
+    "userId": "625e05829b7ce6039bd8a40f"
 }

@@ -17,4 +17,15 @@ Content-Type: application/json
      "name": "Test User 2",
     "password": "casa"
 }
+
+###
+
+POST http://localhost:3001/api/users 
+Content-Type: application/json
+
+{
+    "username": "lolo",
+     "name": "Toy Story 2",
+    "password": "admin"
+}
        

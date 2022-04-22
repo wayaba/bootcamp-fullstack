@@ -26,6 +26,12 @@ Extensiones a instalar en VCode:
 
 # el .env
 
+Para el token de la sesion
+
+```
+SECRET=chinchulancha951
+```
+
 Siempre con el puerto
 
 ```

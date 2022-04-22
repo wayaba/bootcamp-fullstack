@@ -1,4 +1,5 @@
 const notesRouter = require('express').Router()
+const userExtractor = require('../middleware/userExtractor')
 const Note = require('../models/note')
 const User = require('../models/user')
 
@@ -18,15 +19,15 @@ notesRouter.get('/:id', (request, response, next) => {
     .catch((e) => next(e))
 })
 
-notesRouter.delete('/:id', (request, response, next) => {
+notesRouter.delete('/:id', userExtractor, (request, response, next) => {
   const { id } = request.params
   Note.findByIdAndDelete(id)
     .then(() => response.status(204).end())
     .catch((error) => next(error))
 })
 
-notesRouter.post('/', async (request, response, next) => {
-  const { content, important = false, userId } = request.body
+notesRouter.post('/', userExtractor, async (request, response, next) => {
+  const { content, important = false } = request.body
 
   if (!content) {
     return response.status(400).json({
@@ -34,6 +35,7 @@ notesRouter.post('/', async (request, response, next) => {
     })
   }
 
+  const { userId } = request
   const user = await User.findById(userId)
 
   const newNote = new Note({
@@ -44,10 +46,6 @@ notesRouter.post('/', async (request, response, next) => {
   })
 
   try {
-    // await User.findOneAndUpdate({ id: user._id }, user, {
-    //   runValidators: false,
-    // })
-
     const savedNote = await newNote.save()
     user.notes = [...user.notes, savedNote._id]
     await user.save()
@@ -58,7 +56,7 @@ notesRouter.post('/', async (request, response, next) => {
   }
 })
 
-notesRouter.put('/:id', (request, response) => {
+notesRouter.put('/:id', userExtractor, (request, response) => {
   const { id } = request.params
 
   const note = request.body

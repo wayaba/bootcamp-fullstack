@@ -4,13 +4,12 @@ import Note from './components/Note'
 import Notification from './components/Notification'
 import noteService from './services/notes'
 import loginService from './services/login'
+import LoginForm from './components/LoginForm'
 
 const App = () => {
   const [notes, setNotes] = useState([])
   const [showAll, setShowAll] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
   useEffect(() => {
@@ -67,21 +66,15 @@ const App = () => {
       })
   }
 
-  const handleLoginSubmit = async (event) => {
-    event.preventDefault()
-    console.log('submitt')
+  const doLogin = async (credentials) => {
     try {
-      const user = await loginService.login({
-        username,
-        password,
-      })
-      console.log(user)
+      console.log(credentials)
+      const user = await loginService.login(credentials)
+      console.log('luego del login en la base: ', user)
 
       window.localStorage.setItem('loggedNoteAppUser', JSON.stringify(user))
       noteService.setToken(user.token)
       setUser(user)
-      setUsername('')
-      setPassword('')
     } catch (error) {
       setErrorMessage('Wrong credentials')
       setTimeout(() => {
@@ -92,31 +85,15 @@ const App = () => {
 
   return (
     <div>
-      <h2>Login</h2>
-      <form onSubmit={handleLoginSubmit}>
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          placeholder="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          placeholder="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-        <button>Login</button>
-      </form>
-
-      <Notification message={errorMessage} />
-      <NoteForm addNote={addNote}></NoteForm>
-      <div>
-        <button onClick={handleLogout}>Cerrar Sesion</button>
-      </div>
       <h1>Notas</h1>
+      <Notification message={errorMessage} />
+
+      {user ? (
+        <NoteForm addNote={addNote} handleLogout={handleLogout}></NoteForm>
+      ) : (
+        <LoginForm doLogin={doLogin} />
+      )}
+
       <button onClick={handleShowAll}>
         {showAll ? 'Muestra solo importantes' : 'Muestra Todos'}
       </button>

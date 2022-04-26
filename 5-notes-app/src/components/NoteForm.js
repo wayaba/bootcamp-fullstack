@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import Togglable from './Togglable'
 
-const NoteForm = ({ addNote }) => {
+const NoteForm = ({ addNote, handleLogout }) => {
   const [newNote, setNewNote] = useState('')
 
   const handleSubmit = (event) => {
@@ -9,7 +10,7 @@ const NoteForm = ({ addNote }) => {
       content: newNote,
       important: false,
     }
-    console.log({ note })
+
     addNote(note)
     setNewNote('')
   }
@@ -19,7 +20,7 @@ const NoteForm = ({ addNote }) => {
   }
 
   return (
-    <>
+    <Togglable buttonLabel="New Note">
       <h3>Create a new note</h3>
 
       <form onSubmit={handleSubmit}>
@@ -30,7 +31,10 @@ const NoteForm = ({ addNote }) => {
         />
         <button type="submit">save</button>
       </form>
-    </>
+      <div>
+        <button onClick={handleLogout}>Logout</button>
+      </div>
+    </Togglable>
   )
 }
 
